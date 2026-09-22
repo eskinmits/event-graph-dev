@@ -1,6 +1,13 @@
+"""The in-memory projection.
+
+A disposable lens over the canonical ClickHouse tables (D1). It holds no unique
+information: delete it, rebuild it, and you are exactly where you were. Nothing is ever
+written here -- inference results go back to ClickHouse and arrive on the next rebuild.
+"""
+
 import logging
 from collections import Counter, deque
-from collections.abc import Iterator
+from collections.abc import Collection, Iterator
 from dataclasses import dataclass, field
 from enum import StrEnum
 
@@ -247,6 +254,68 @@ class EventGraph:
         if doomed:
             logger.info("pruned %d hub nodes above degree %d", len(doomed), max_degree)
         return doomed
+
+    def nodes(self) -> Iterator[Node]:
+        """Every node held, in no particular order."""
+        return iter(self._graph.nodes())
+
+    def edges(self) -> Iterator[Edge]:
+        """Every edge held, in no particular order."""
+        return iter(self._graph.edges())
+
+    def search(
+        self,
+        text: str,
+        *,
+        node_types: frozenset[NodeType] | None = None,
+        limit: int = 20,
+    ) -> list[Node]:
+        """Find nodes whose label or natural key contains `text`, case-folded.
+
+        Ranked exact, then prefix, then substring, so typing a full event title puts that
+        event first rather than whichever row the scan happened to reach first.
+        """
+        needle = text.casefold().strip()
+        if not needle:
+            return []
+
+        ranked: list[tuple[int, str, Node]] = []
+        for node in self._graph.nodes():
+            if node_types is not None and node.node_type not in node_types:
+                continue
+            label = node.label.casefold()
+            if needle in label:
+                rank = 0 if label == needle else 1 if label.startswith(needle) else 2
+            elif needle in node.natural_key.casefold():
+                rank = 3
+            else:
+                continue
+            ranked.append((rank, node.label, node))
+
+        ranked.sort(key=lambda item: (item[0], len(item[1]), item[1]))
+        return [node for _, _, node in ranked[:limit]]
+
+    def induced_edges(
+        self,
+        node_ids: Collection[str],
+        *,
+        max_degree: int | None = None,
+    ) -> Iterator[Edge]:
+        """Yield every edge whose endpoints are both in `node_ids`.
+
+        A neighbourhood's paths form a tree; these are the edges that close it back into a
+        graph -- two artists on the same bill, a venue's other events. `max_degree` skips
+        scanning out of hubs, which is where the cost would otherwise be.
+        """
+        for node_id in node_ids:
+            index = self._index_by_node_id.get(node_id)
+            if index is None:
+                continue
+            if max_degree is not None and self._graph.out_degree(index) > max_degree:
+                continue
+            for _, dst, edge in self._graph.out_edges(index):
+                if self._graph[dst].node_id in node_ids:
+                    yield edge
 
     def node_counts(self) -> dict[NodeType, int]:
         return dict(Counter(node.node_type for node in self._graph.nodes()))

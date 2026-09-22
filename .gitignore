@@ -20,3 +20,6 @@ wheels/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# Cached graph slices, rebuildable from ClickHouse (D1)
+slices/

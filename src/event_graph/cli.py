@@ -1,5 +1,6 @@
 import logging
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import click
@@ -19,6 +20,8 @@ from event_graph.graph import (
     Predicate,
     keep_everything,
 )
+from event_graph.graph.store import load_graph, save_graph
+from event_graph.web import Explorer, missing_assets, serve
 
 
 @click.group()
@@ -46,7 +49,7 @@ def slice_options[F: Callable[..., None]](command: F) -> F:
                 "--predicate",
                 "predicates",
                 multiple=True,
-                type=click.Choice([p.value for p in Predicate]),
+                type=click.Choice([p.value for p in Predicate]),  # noqa
                 help="Restrict to these predicates. Repeatable.",
             ),
             click.option(
@@ -75,7 +78,19 @@ def slice_options[F: Callable[..., None]](command: F) -> F:
     return command
 
 
-def _build(
+def load_option[F: Callable[..., None]](command: F) -> F:
+    """Read a slice built earlier instead of querying ClickHouse."""
+    return click.option(
+        "--load",
+        "load",
+        default=None,
+        type=click.Path(dir_okay=False, path_type=Path),
+        help="Load a slice saved by `graph build --save` instead of rebuilding.",
+    )(command)
+
+
+def _projection(
+    load: Path | None,
     country: str | None,
     predicates: tuple[str, ...],
     min_confidence: float,
@@ -84,6 +99,26 @@ def _build(
     prune_above_degree: int | None,
     lenient: bool,
 ) -> tuple[EventGraph, BuildMetadata, BuildReport]:
+    if load is not None:
+        if any(
+            (
+                country,
+                predicates,
+                min_confidence,
+                max_edges,
+                keep_junk_hubs,
+                prune_above_degree,
+                lenient,
+            )
+        ):
+            raise click.UsageError(
+                "--load reads a slice that was already built, so the slice flags cannot "
+                "change it. Drop them, or rebuild with `graph build --save`."
+            )
+        saved = load_graph(load)
+        click.echo(f"loaded {saved.describe()}", err=True)
+        return saved.graph, saved.metadata, saved.report
+
     graph_slice = GraphSlice(
         country=country,
         predicates=frozenset(Predicate(p) for p in predicates) or None,
@@ -105,13 +140,19 @@ def graph() -> None:
 
 
 @graph.command("build")
+@click.option(
+    "--save",
+    default=None,
+    type=click.Path(dir_okay=False, path_type=Path),
+    help="Write the built slice here so later commands can skip the rebuild.",
+)
 @slice_options
-def build_graph(**options: Any) -> None:
+def build_graph(save: Path | None, **options: Any) -> None:
     """Build the projection and report what it contains."""
-    projection, metadata, report = _build(**options)
+    projection, metadata, report = _projection(load=None, **options)
 
     click.echo(f"Source:    {metadata.source}")
-    click.echo(f"Built at:  {metadata.built_at:%Y-%m-%d %H:%M:%S %Z} (commit {metadata.git_commit})")
+    click.echo(f"Built at:  {metadata.built_at:%Y-%m-%d %H:%M:%S %Z} (commit {metadata.git_commit})")  # noqa
     click.echo(report.summary())
 
     click.echo("\nNodes by type")
@@ -126,6 +167,10 @@ def build_graph(**options: Any) -> None:
     ):
         click.echo(f"  {predicate.value:<20} {count:>12,}")
 
+    if save is not None:
+        save_graph(save, projection, metadata, report)
+        click.echo(f"\nSaved to {save} · reload it with --load {save}")
+
 
 @graph.command("show")
 @click.argument("node_id")
@@ -139,13 +184,14 @@ def build_graph(**options: Any) -> None:
 @click.option(
     "--direction",
     default=Direction.BOTH.value,
-    type=click.Choice([d.value for d in Direction]),
+    type=click.Choice([d.value for d in Direction]),  # noqa
 )
 @click.option(
     "--through-classifications",
     is_flag=True,
     help="Also walk through genre and provider nodes, which connect unrelated events.",
 )
+@load_option
 @slice_options
 def show_neighbourhood(
     node_id: str,
@@ -159,7 +205,7 @@ def show_neighbourhood(
 
     NODE_ID is a canonical id such as event:abc-123.
     """
-    projection, _, _ = _build(**options)
+    projection, _, _ = _projection(**options)
 
     neighbourhood = projection.expand(
         node_id,
@@ -197,3 +243,27 @@ def show_ontology() -> None:
             if on
         )
         click.echo(f"  {spec.predicate.value:<16} {domain} -> {range_}  {flags}")
+
+
+@graph.command("serve")
+@click.option("--host", default="127.0.0.1", help="Interface to bind. Loopback by default.")
+@click.option("--port", default=8000, type=int, help="Port to listen on.")
+@load_option
+@slice_options
+def serve_explorer(host: str, port: int, **options: Any) -> None:
+    """Explore the projection in a browser: search a node, see its neighbourhood and why.
+
+    The slice is held in memory for the life of the process, so pass --load unless you
+    want to wait for a rebuild first.
+    """
+    absent = missing_assets()
+    if absent:
+        raise click.UsageError(
+            f"the explorer's front-end is missing {', '.join(absent)}. "
+            "Expected them in src/event_graph/web/static/."
+        )
+
+    projection, metadata, report = _projection(**options)
+    click.echo(f"Serving {projection.node_count:,} nodes on http://{host}:{port}")
+    click.echo("Ctrl-C to stop.")
+    serve(Explorer(projection, metadata, report), host=host, port=port)
