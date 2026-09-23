@@ -6,6 +6,7 @@ from typing import Any
 import click
 
 from event_graph.clickhouse import get_client as get_clickhouse_client
+from event_graph.config import get_config
 from event_graph.graph import (
     DEFAULT_NODE_FILTER,
     BuildMetadata,
@@ -22,6 +23,7 @@ from event_graph.graph import (
 )
 from event_graph.graph.store import load_graph, save_graph
 from event_graph.web import Explorer, missing_assets, serve
+from event_graph.web.inferences import InferredOverlay
 
 
 @click.group()
@@ -251,7 +253,6 @@ def create_inferred() -> None:
 
     Safe to rerun. The table name comes from GRAPH_INFERRED_TABLE (see config.py).
     """
-    from event_graph.config import get_config
     from event_graph.graph.inferred import create_inferred_table
 
     table = get_config().graph.inferred_table
@@ -262,14 +263,35 @@ def create_inferred() -> None:
 @graph.command("serve")
 @click.option("--host", default="127.0.0.1", help="Interface to bind. Loopback by default.")
 @click.option("--port", default=8000, type=int, help="Port to listen on.")
+@click.option(
+    "--inferred",
+    "inferred_path",
+    default=None,
+    type=click.Path(dir_okay=False, path_type=Path),
+    help="Show inferred edges from a JSONL file written by bin/lineup_linking.py.",
+)
+@click.option(
+    "--inferred-run",
+    default=None,
+    help="Show one run read back from the inferred-edges table in ClickHouse.",
+)
 @load_option
 @slice_options
-def serve_explorer(host: str, port: int, **options: Any) -> None:
+def serve_explorer(
+    host: str,
+    port: int,
+    inferred_path: Path | None,
+    inferred_run: str | None,
+    **options: Any,
+) -> None:
     """Explore the projection in a browser: search a node, see its neighbourhood and why.
 
     The slice is held in memory for the life of the process, so pass --load unless you
-    want to wait for a rebuild first.
+    want to wait for a rebuild first. Inferred edges are shown beside the projection, never
+    loaded into it.
     """
+    if inferred_path and inferred_run:
+        raise click.UsageError("pass --inferred or --inferred-run, not both.")
     absent = missing_assets()
     if absent:
         raise click.UsageError(
@@ -277,7 +299,17 @@ def serve_explorer(host: str, port: int, **options: Any) -> None:
             "Expected them in src/event_graph/web/static/."
         )
 
+    inferred: InferredOverlay | None = None
+    if inferred_path:
+        inferred = InferredOverlay.from_jsonl(inferred_path)
+    elif inferred_run:
+        inferred = InferredOverlay.from_clickhouse(
+            get_clickhouse_client(), get_config().graph.inferred_table, inferred_run
+        )
+
     projection, metadata, report = _projection(**options)
     click.echo(f"Serving {projection.node_count:,} nodes on http://{host}:{port}")
+    if inferred:
+        click.echo(f"with {inferred.description}")
     click.echo("Ctrl-C to stop.")
-    serve(Explorer(projection, metadata, report), host=host, port=port)
+    serve(Explorer(projection, metadata, report, inferred), host=host, port=port)

@@ -104,7 +104,8 @@ def main(
     evaluation = evaluate(decisions)
     click.echo(f"\n== eval, {country}\n{report(evaluation)}")
 
-    version = "v1" if exact_only else "v2"
+    # v2 walked duplicate listings when gathering spelling candidates; v3 does not
+    version = "v1" if exact_only else "v3"
     run_id = f"{datetime.now(UTC):%Y-%m-%dT%H:%M}_{country.lower()}_lineup_{version}"
     proposals, dropped = propose(
         decisions, evaluation, run_id=run_id, eval_command=command, precision_floor=floor

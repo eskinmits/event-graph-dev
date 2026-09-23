@@ -28,7 +28,7 @@ from typing import Final
 import click
 
 from event_graph.clickhouse import get_client
-from event_graph.graph import EventGraph
+from event_graph.graph import EventGraph, Predicate
 from event_graph.graph.store import load_graph
 from event_graph.linking.neighbourhood import Adjacency, build_adjacency, personalized_pagerank
 
@@ -74,7 +74,21 @@ def top(scores: dict[int, float], keep: Callable[[int], bool], k: int) -> list[i
 @click.option("--events", "sample_size", default=600, type=int, help="Test events to mask.")
 @click.option("--alpha", default=0.15, type=float, help="Restart probability.")
 @click.option("--steps", default=4, type=int, help="Walk length; artists sit 3 hops out.")
-def main(slice_path: Path, country: str, sample_size: int, alpha: float, steps: int) -> None:
+@click.option(
+    "--without",
+    "without",
+    multiple=True,
+    type=click.Choice([p.value for p in Predicate]),  # noqa
+    help="Leave a predicate out of the walk, to see what it carries. Repeatable.",
+)
+def main(
+    slice_path: Path,
+    country: str,
+    sample_size: int,
+    alpha: float,
+    steps: int,
+    without: tuple[str, ...],
+) -> None:
     rows = get_client().query(
         """
         SELECT concat('event:', event_id)
@@ -91,7 +105,7 @@ def main(slice_path: Path, country: str, sample_size: int, alpha: float, steps: 
 
     graph = load_graph(slice_path).graph
     started = time.monotonic()
-    adjacency = build_adjacency(graph)
+    adjacency = build_adjacency(graph, frozenset(Predicate(p) for p in without))
     click.echo(
         f"adjacency: {len(adjacency.ids):,} entity nodes in {time.monotonic() - started:.0f}s",
         err=True,
@@ -145,6 +159,7 @@ def main(slice_path: Path, country: str, sample_size: int, alpha: float, steps: 
 
     click.echo(
         f"\n{len(tests):,} masked {country} events · alpha {alpha} · {steps} steps · "
+        f"without {','.join(without) or 'nothing'} · "
         f"{(time.monotonic() - started) / max(1, len(tests)):.2f}s per event"
     )
     header = "  ".join(f"{'@' + str(k):>6}" for k in KS)

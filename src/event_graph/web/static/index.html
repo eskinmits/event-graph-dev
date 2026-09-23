@@ -13,6 +13,45 @@
         <button id="theme-toggle" type="button" title="Switch light / dark">◐</button>
       </header>
 
+      <nav class="tabs" role="tablist">
+        <button type="button" class="tab" data-tab="search" aria-selected="true">Search</button>
+        <button type="button" class="tab" data-tab="inferences" aria-selected="false">
+          Inferences <span id="inferred-count" class="count"></span>
+        </button>
+        <button type="button" class="tab" data-tab="predict" aria-selected="false">Predict</button>
+      </nav>
+
+      <section id="tab-predict" class="tab-body" hidden>
+        <div class="inferred-summary">
+          <span class="big">Who plays here?</span>
+          Structure only: no name, no title. Each sampled event's artists are hidden, then a
+          personalized PageRank walk from the event through its venue, promoter, series and
+          the acts around them ranks every artist in the slice.
+        </div>
+        <button id="predict-run" type="button" class="action">Run on a sample of events</button>
+        <div id="predict-summary" class="inferred-summary" hidden></div>
+        <ul id="predict-list" class="results worklist"></ul>
+      </section>
+
+      <section id="tab-inferences" class="tab-body" hidden>
+        <div id="inferred-summary" class="inferred-summary"></div>
+        <div class="field">
+          <label for="inferred-filter">Filter</label>
+          <input id="inferred-filter" type="search" autocomplete="off" placeholder="event or artist…" />
+          <select id="inferred-arm">
+            <option value="">every rule</option>
+            <option value="unique_name">unique name</option>
+            <option value="graph_ranked">graph ranked</option>
+            <option value="popularity_only">popularity only</option>
+            <option value="neighbourhood_equal">spelling, near in graph</option>
+            <option value="neighbourhood_contains">name inside, near in graph</option>
+          </select>
+        </div>
+        <p id="inferred-matched" class="meta-line"></p>
+        <ul id="inferred-list" class="results worklist"></ul>
+      </section>
+
+      <section id="tab-search" class="tab-body">
       <div class="field">
         <label for="search">Search</label>
         <input
@@ -27,6 +66,7 @@
       </div>
 
       <ul id="results" class="results"></ul>
+      </section>
 
       <details class="controls" open>
         <summary>Walk</summary>
@@ -64,6 +104,9 @@
           <li><span class="swatch-line dashed"></span>inferred edge</li>
           <li><span class="swatch-line thick"></span>thicker = higher confidence</li>
           <li><span class="swatch-line path"></span>on the path that explains a node</li>
+          <li><span class="swatch-line proposed"></span>proposed link (inferred)</li>
+          <li><span class="swatch-line rival"></span>same-name row that lost</li>
+          <li><span class="dot truth-dot"></span>✓ the artist really playing (hidden from the walk)</li>
         </ul>
       </details>
 
@@ -81,6 +124,13 @@
         <p id="detail-subtitle" class="detail-subtitle"></p>
         <h3>Why it is here</h3>
         <p id="detail-explain" class="explain"></p>
+        <div class="reasoning-actions">
+          <button type="button" id="detail-predict" class="action" hidden>Predict artists from structure</button>
+        </div>
+        <div id="detail-inferred" hidden>
+          <h3>Inferred links</h3>
+          <ul id="detail-inferred-list" class="inferred-links"></ul>
+        </div>
         <h3>Edges</h3>
         <table class="edge-table">
           <thead>
@@ -93,6 +143,38 @@
           </thead>
           <tbody id="detail-edges"></tbody>
         </table>
+      </section>
+
+      <section id="prediction" class="detail reasoning" hidden>
+        <button id="prediction-close" type="button" class="detail-close">×</button>
+        <p class="eyebrow">Predicted from structure</p>
+        <h2 id="prediction-title"></h2>
+        <p id="prediction-subtitle" class="detail-subtitle"></p>
+        <div id="prediction-truth" class="truth"></div>
+        <h3>Top of the ranking</h3>
+        <ol id="prediction-list" class="predictions"></ol>
+        <h3>How this is computed</h3>
+        <p class="explain">
+          A random walk starts at the event and, at every step, either moves to a random
+          neighbour or jumps back to the event (15%). After four steps, the share of time it
+          spent on each artist is that artist's score. Genre and city nodes are never walked
+          through: they connect everything, and neither are duplicate listings of the event
+          (<code>same_as</code>), which still carry its artist and would give the answer
+          away. Nothing here reads a name or a title. The paths
+          are the routes that carried most of the walk to each artist; hover a row to trace them.
+        </p>
+      </section>
+
+      <section id="reasoning" class="detail reasoning" hidden>
+        <button id="reasoning-close" type="button" class="detail-close">×</button>
+        <p class="eyebrow">Proposed link</p>
+        <h2 id="reasoning-title"></h2>
+        <p id="reasoning-subtitle" class="detail-subtitle"></p>
+        <div class="reasoning-actions">
+          <button type="button" id="open-event" class="action">Event neighbourhood</button>
+          <button type="button" id="open-artist" class="action">Artist neighbourhood</button>
+        </div>
+        <ol id="reasoning-steps" class="steps"></ol>
       </section>
     </main>
 

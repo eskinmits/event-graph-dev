@@ -71,6 +71,33 @@ uv run event-graph graph serve --load slices/es.pkl                # ~20s to loa
 
 Open <http://127.0.0.1:8000>, type an event name, and click a result.
 
+To see what inference proposed, and why, serve the proposals beside the slice:
+
+```bash
+uv run python bin/lineup_linking.py --country NL --slice slices/nl.pkl       # writes out/lineup_proposals_nl.jsonl
+uv run event-graph graph serve --load slices/nl.pkl --inferred out/lineup_proposals_nl.jsonl
+uv run event-graph graph serve --load slices/nl.pkl --inferred-run <run_id>   # once written to ClickHouse
+```
+
+The **Inferences** tab is the worklist. Clicking a proposal draws only its evidence: the
+target event, the proposed artist (dashed), the graph paths that support it and any
+same-name rows that lost. The panel then walks through the provider's name, the name
+resolution, each graph signal (hover one to trace it on the graph), the guards, the rule's
+measured precision and the rollback. Every view is in the address bar (`?edge=…`,
+`?node=…`), so a link to one proposal can be pasted to someone. Inferred edges are held
+beside the projection, never loaded into it.
+
+The **Predict** tab asks the graph who plays an event with no name to go on. It hides a
+sample of events' artists and ranks every artist in the slice by personalized PageRank from
+the event, then reports how often the true one comes first, next to the venue-history
+baseline (NL: about 7% #1 and 18% in the top 10 out of 321,076 artists, against 5% and 16%
+for ranking the venue's acts by bookings). Duplicate listings (`same_as`) are left out of the
+walk: a redirected copy still carries the event's artist, so walking it finds the answer
+instead of predicting it. With them in, the rate looked twice as high; that lift was entirely
+duplicates. Any event's detail panel has **Predict artists from structure**: the top 10,
+where the real artist landed, and, on hover, the routes through promoters, venues and
+earlier gigs that carried the walk to each one (`?predict=<event id>`).
+
 `--load` is the difference between exploring the graph and waiting for it: the slice loads
 in seconds instead of minutes, and once the process is up a search over ~1M nodes takes
 ~0.3s and a two-hop neighbourhood ~0.05s. Slices live in `slices/`, which is gitignored —
