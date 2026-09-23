@@ -15,6 +15,8 @@ closure is the same one `EventGraph.components({Predicate.SAME_AS})` produces.
 | `duplicate_name_reach.py` | How much of the upcoming catalogue sits behind a *live* duplicated artist or venue, plus the common-word artist blocklist |
 | `junk_nodes.py` | Which nodes are junk hubs (placeholder artists, theme nights, city-named venues, deletion sinks) and which are real nodes carrying wrong links. Writes a seed-shaped CSV |
 | `duplicate_detection_backtest.py` | Could we surface a duplicate event before ops manually redirects it? Rule recall, candidate volume, and the standing worklist |
+| `lineup_linking.py` | Links artist-less upcoming events to artists from Event Engine lineup names. Evaluates each rule on already-linked events, sets confidence to the measured precision (D15), writes a worklist CSV and the inferred-edge rows as JSONL; `--write` inserts them under one `run_id` |
+| `structural_artist_prediction.py` | Can structure alone predict who plays an event? Masks known artists and ranks by personalized PageRank from the event, against most-linked and most-booked-at-this-venue baselines. Needs a cached slice |
 | `duplicate_graph_signals.py` | Does graph structure tell real duplicates from same-venue coincidences? Needs a cached slice |
 
 ```bash
@@ -30,6 +32,10 @@ uv run python bin/junk_nodes.py                              # writes junk_nodes
 
 uv run event-graph graph build --country NL --save slices/nl.pkl   # once, ~6 min
 uv run python bin/duplicate_graph_signals.py --slice slices/nl.pkl --country NL
+
+uv run python bin/structural_artist_prediction.py --slice slices/nl.pkl --country NL   # ~1 min
+uv run python bin/lineup_linking.py --country NL --slice slices/nl.pkl           # ~50 s, writes out/
+uv run python bin/lineup_linking.py --country NL --slice slices/nl.pkl --write   # also inserts into ClickHouse
 ```
 
 `_redirects.py` is the shared loader: redirect pairs, transitive closure, `dim_events`
