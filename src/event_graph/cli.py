@@ -245,6 +245,20 @@ def show_ontology() -> None:
         click.echo(f"  {spec.predicate.value:<16} {domain} -> {range_}  {flags}")
 
 
+@graph.command("create-inferred-table")
+def create_inferred() -> None:
+    """Create the table inference writes back to, if it does not exist yet.
+
+    Safe to rerun. The table name comes from GRAPH_INFERRED_TABLE (see config.py).
+    """
+    from event_graph.config import get_config
+    from event_graph.graph.inferred import create_inferred_table
+
+    table = get_config().graph.inferred_table
+    created = create_inferred_table(get_clickhouse_client(), table)
+    click.echo(f"{'Created' if created else 'Already exists:'} {table}")
+
+
 @graph.command("serve")
 @click.option("--host", default="127.0.0.1", help="Interface to bind. Loopback by default.")
 @click.option("--port", default=8000, type=int, help="Port to listen on.")

@@ -5,6 +5,7 @@ import pytest
 from event_graph.graph import (
     ENTITY_NODE_TYPES,
     ClickHouseGraphSource,
+    ConfigurationError,
     Direction,
     EmptyGraphError,
     GraphBuilder,
@@ -22,6 +23,7 @@ from event_graph.graph import (
 )
 from event_graph.graph.edges import Edge
 from event_graph.graph.graph import EventGraph
+from event_graph.graph.inferred import inferred_table_ddl
 from event_graph.graph.ontology import deterministic_edge_id, parse_node_id
 
 from tests.conftest import make_edge, make_node
@@ -298,3 +300,21 @@ class TestClickHouseSourceSql:
         )
         with pytest.raises(ConfigurationError, match="identifier"):
             source._nodes_query()
+
+
+class TestInferredTable:
+    def test_ddl_matches_the_write_contract(self) -> None:
+        ddl = inferred_table_ddl("machine_learning.graph_edges_inferred")
+        assert "create table if not exists machine_learning.graph_edges_inferred" in ddl
+        assert "ReplacingMergeTree(data_updated_at)" in ddl
+        assert "order by (edge_id, run_id)" in ddl
+        assert "evidence        String default '{}'" in ddl
+
+    def test_ddl_columns_cover_every_edge_field(self) -> None:
+        ddl = inferred_table_ddl("graph_edges_inferred")
+        for column in Edge.COLUMNS:
+            assert f"\n    {column} " in ddl
+
+    def test_unsafe_table_name_is_rejected(self) -> None:
+        with pytest.raises(ConfigurationError):
+            inferred_table_ddl("x; drop table y")

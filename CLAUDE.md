@@ -25,9 +25,11 @@ reopened, it gets a new numbered entry in Notion.
 
 - **ClickHouse is canonical** (D1). Node and edge tables built by dbt are the source of truth.
   Any graph engine is a disposable projection rebuilt from them, holding no unique information.
-  Inference results round-trip back through ClickHouse. The graph tables live in the `dbt_dev`
-  schema (`dim_graph_nodes`, `bridge_graph_edges_source`, `graph_edges_inferred`); the source
-  dims such as `dim_events` stay in `dbt`. Defaults are in `GraphTablesConfig` in `config.py`.
+  Inference results round-trip back through ClickHouse. The dbt-built graph tables live in the
+  `dbt_dev` schema (`dim_graph_nodes`, `bridge_graph_edges_source`); the source dims such as
+  `dim_events` stay in `dbt`. Inferred edges go to `machine_learning.graph_edges_inferred`,
+  which this repo owns (`event-graph graph create-inferred-table`) — never into a dbt-built
+  table, which the next dbt run would wipe. Defaults are in `GraphTablesConfig` in `config.py`.
 - **No graph database in the dependency path** (D2, D3). Compute with `rustworkx` in Python.
   The inference work is mostly bounded-hop, which is joins, and ClickHouse is good at those.
   Kùzu was evaluated and rejected — the repo was archived by its owner in Oct 2025.

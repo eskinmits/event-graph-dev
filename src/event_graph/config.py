@@ -28,7 +28,7 @@ class GraphTablesConfig(BaseSettings):
     edges_table: str = "dbt_dev.bridge_graph_edges_source"
     node_id_column: str = "pk_dim_graph_nodes"
 
-    inferred_table: str = "dbt_dev.graph_edges_inferred"
+    inferred_table: str = "machine_learning.graph_edges_inferred"
 
     # slicing by market joins event nodes back to the events dim on their natural key
     events_table: str = "dbt.dim_events"

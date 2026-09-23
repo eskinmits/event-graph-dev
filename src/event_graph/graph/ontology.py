@@ -52,7 +52,7 @@ class SourceClass(StrEnum):
     """The grouped provenance enum. The raw upstream value stays in `Edge.source`.
 
     The first six are produced by dbt. `graph_inferred` is ours alone -- it never appears
-    in `bridge_graph_edges_source`, only in `dbt_dev.graph_edges_inferred`.
+    in `bridge_graph_edges_source`, only in `machine_learning.graph_edges_inferred`.
     """
 
     ADMIN_VERIFIED = "admin_verified"

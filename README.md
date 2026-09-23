@@ -20,7 +20,7 @@ ClickHouse (canonical)            Python (disposable)              You
 dbt_dev.dim_graph_nodes    ──▶  EventGraph (rustworkx)     ──▶   graph serve  (browser)
 dbt_dev.bridge_graph_edges_source    │                           graph show   (terminal)
                                        │
-dbt_dev.graph_edges_inferred  ◀──────┘  inference writes back
+machine_learning.graph_edges_inferred ◀─┘  inference writes back
 ```
 
 ClickHouse is the source of truth. The in-memory projection holds no unique information —
@@ -85,6 +85,7 @@ they are a cache, rebuildable from ClickHouse at any time.
 | `event-graph graph serve` | Browser explorer over one projection |
 | `event-graph graph show <node_id>` | Same walk, printed to the terminal |
 | `event-graph graph ontology` | Print the node and edge vocabulary this repo understands |
+| `event-graph graph create-inferred-table` | Create `machine_learning.graph_edges_inferred`, the table inference writes to. Idempotent |
 
 Add `-v` before the subcommand for progress logging: `event-graph -v graph build …`.
 
