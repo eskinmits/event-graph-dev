@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Event Graph Explorer</title>
+    <link rel="stylesheet" href="/static/explorer.css" />
+  </head>
+  <body>
+    <aside class="panel">
+      <header class="panel-head">
+        <h1>Event Graph</h1>
+        <button id="theme-toggle" type="button" title="Switch light / dark">◐</button>
+      </header>
+
+      <div class="field">
+        <label for="search">Search</label>
+        <input
+          id="search"
+          type="search"
+          autocomplete="off"
+          placeholder="Sónar Reykjavik, Ziggo Dome…"
+        />
+        <select id="search-type">
+          <option value="">any type</option>
+        </select>
+      </div>
+
+      <ul id="results" class="results"></ul>
+
+      <details class="controls" open>
+        <summary>Walk</summary>
+        <div class="field-row">
+          <label for="hops">Hops</label>
+          <input id="hops" type="number" min="1" max="4" value="2" />
+        </div>
+        <div class="field-row">
+          <label for="direction">Direction</label>
+          <select id="direction">
+            <option value="both">both</option>
+            <option value="out">out</option>
+            <option value="in">in</option>
+          </select>
+        </div>
+        <div class="field-row">
+          <label for="min-confidence">Min confidence</label>
+          <input id="min-confidence" type="number" min="0" max="1" step="0.1" value="0" />
+        </div>
+        <div class="field-row">
+          <label for="max-degree">Max degree</label>
+          <input id="max-degree" type="number" min="1" step="100" value="1000" />
+        </div>
+        <label class="check">
+          <input id="through-classifications" type="checkbox" />
+          walk through genre / provider
+        </label>
+      </details>
+
+      <details class="legend">
+        <summary>Legend</summary>
+        <ul id="legend-nodes" class="legend-list"></ul>
+        <ul class="legend-list">
+          <li><span class="swatch-line solid"></span>sourced edge</li>
+          <li><span class="swatch-line dashed"></span>inferred edge</li>
+          <li><span class="swatch-line thick"></span>thicker = higher confidence</li>
+          <li><span class="swatch-line path"></span>on the path that explains a node</li>
+        </ul>
+      </details>
+
+      <footer id="slice-meta" class="slice-meta"></footer>
+    </aside>
+
+    <main class="stage">
+      <div id="graph"></div>
+      <div id="status" class="status"></div>
+      <div id="tooltip" class="tooltip" hidden></div>
+
+      <section id="detail" class="detail" hidden>
+        <button id="detail-close" type="button" class="detail-close">×</button>
+        <h2 id="detail-title"></h2>
+        <p id="detail-subtitle" class="detail-subtitle"></p>
+        <h3>Why it is here</h3>
+        <p id="detail-explain" class="explain"></p>
+        <h3>Edges</h3>
+        <table class="edge-table">
+          <thead>
+            <tr>
+              <th>Predicate</th>
+              <th>Other end</th>
+              <th>Source</th>
+              <th class="num">Conf.</th>
+            </tr>
+          </thead>
+          <tbody id="detail-edges"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script src="/static/cytoscape.min.js"></script>
+    <script src="/static/explorer.js"></script>
+  </body>
+</html>
