@@ -70,7 +70,7 @@ class Edge(BaseModel):
         evidence: dict[str, Any],
         observed_at: datetime | None = None,
     ) -> Self:
-        """Mint an edge this run proposes, addressed to `dbt_graph.graph_edges_inferred`.
+        """Mint an edge this run proposes, addressed to `dbt_dev.graph_edges_inferred`.
 
         `evidence` is not optional here on purpose: an inferred edge nobody can explain is
         not something we are willing to write.

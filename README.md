@@ -17,10 +17,10 @@ graph that merely exists.
 ```
 ClickHouse (canonical)            Python (disposable)              You
 ─────────────────────             ───────────────────              ───
-dbt_graph.dim_graph_nodes    ──▶  EventGraph (rustworkx)     ──▶   graph serve  (browser)
-dbt_graph.bridge_graph_edges_source    │                           graph show   (terminal)
+dbt_dev.dim_graph_nodes    ──▶  EventGraph (rustworkx)     ──▶   graph serve  (browser)
+dbt_dev.bridge_graph_edges_source    │                           graph show   (terminal)
                                        │
-dbt_graph.graph_edges_inferred  ◀──────┘  inference writes back
+dbt_dev.graph_edges_inferred  ◀──────┘  inference writes back
 ```
 
 ClickHouse is the source of truth. The in-memory projection holds no unique information —
