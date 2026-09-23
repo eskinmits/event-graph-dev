@@ -3,25 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>EKG Conflict Worklist</title>
+  <title>EKG Worklist</title>
   <link rel="stylesheet" href="app.css">
   <script src="__disco.js"></script>
   <script src="cytoscape.min.js"></script>
 </head>
-<body>
+<body data-view="conflicts">
   <header class="top">
     <div class="brand">
       <span class="mark">EKG</span>
       <div>
-        <h1>Conflict worklist</h1>
-        <p class="sub">Same artist, same night, two listings. Spain, upcoming events.</p>
+        <h1 id="title">Conflict worklist</h1>
+        <p class="sub" id="subtitle">Same artist, same night, two listings. Spain, upcoming events.</p>
       </div>
     </div>
-    <div class="stats" id="stats"></div>
+    <nav class="tabs" role="tablist" aria-label="Worklists">
+      <button role="tab" data-tab="conflicts" aria-selected="true">Event conflicts</button>
+      <button role="tab" data-tab="artists" aria-selected="false">Artist duplicates</button>
+    </nav>
+    <div class="stats view-conflicts" id="stats"></div>
+    <div class="stats view-artists" id="a-stats"></div>
     <div class="people" id="people" title="People reviewing right now"></div>
   </header>
 
-  <main class="layout">
+  <main class="layout view-conflicts">
     <aside class="list-pane">
       <div class="filters" id="filters" role="tablist"></div>
       <label class="search">
@@ -35,7 +40,23 @@
     </section>
   </main>
 
-  <footer class="foot" id="foot"></footer>
+  <main class="layout view-artists">
+    <aside class="list-pane">
+      <div class="filters" id="a-filters" role="tablist"></div>
+      <label class="search">
+        <input id="a-search" type="search" placeholder="Filter by artist, venue or city" autocomplete="off">
+      </label>
+      <ol class="clusters" id="a-groups"></ol>
+    </aside>
+
+    <section class="detail" id="a-detail">
+      <div class="empty">Loading the artist groups…</div>
+    </section>
+  </main>
+
+  <footer class="foot view-conflicts" id="foot"></footer>
+  <footer class="foot view-artists" id="a-foot"></footer>
   <script src="app.js"></script>
+  <script src="artists.js"></script>
 </body>
 </html>

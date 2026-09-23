@@ -534,6 +534,7 @@ function wire() {
     if (choice) recordVerdict(choice.dataset.verdict);
   });
   document.addEventListener('keydown', (evt) => {
+    if (document.body.dataset.view !== 'conflicts') return;
     const typing = evt.target.matches('input, textarea');
     if (evt.key === 'Escape' && typing) { evt.target.blur(); return; }
     if (typing || evt.metaKey || evt.ctrlKey || evt.altKey) return;

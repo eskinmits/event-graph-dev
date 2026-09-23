@@ -290,3 +290,46 @@ h1 { margin: 0; font-size: 17px; }
   .detail { padding: 16px; }
   .events .links { white-space: normal; }
 }
+
+/* tabs: one app, two worklists */
+body[data-view="conflicts"] .view-artists,
+body[data-view="artists"] .view-conflicts { display: none !important; }
+
+.tabs { display: flex; gap: 4px; background: var(--panel-2); border-radius: 9px; padding: 3px; }
+.tabs button {
+  border: 0;
+  background: transparent;
+  border-radius: 7px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--muted);
+}
+.tabs button[aria-selected="true"] { background: var(--panel); color: var(--text); font-weight: 600; box-shadow: var(--shadow); }
+
+/* artist duplicates */
+.artist-graph #a-graph { height: 480px; }
+.explain .body { padding: 12px 14px; }
+.wf-intro { margin: 0 0 10px; color: var(--muted); font-size: 12.5px; }
+.wf-row { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) 46px; gap: 10px; align-items: center; padding: 4px 0; font-size: 13px; }
+.wf-row.prior { color: var(--muted); border-bottom: 1px dashed var(--line); padding-bottom: 8px; margin-bottom: 4px; }
+.wf-track { position: relative; height: 12px; background: var(--panel-2); border-radius: 3px; }
+.wf-track::after { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: var(--muted); }
+.wf-bar { position: absolute; top: 0; bottom: 0; border-radius: 3px; }
+.wf-bar.up { background: var(--ok); }
+.wf-bar.down { background: var(--conflict); }
+.wf-value { font-family: var(--mono); font-size: 12px; text-align: right; }
+.wf-total { margin: 12px 0 0; padding-top: 10px; border-top: 1px solid var(--line); font-size: 13.5px; }
+
+.members { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-top: 16px; }
+.member > h3 { align-items: center; }
+.member > h3 span:first-child { color: var(--text); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.member.keep { border-color: var(--ok); }
+.member-meta { padding: 8px 14px 4px; color: var(--muted); font-size: 12.5px; }
+.member-id { padding: 6px 14px 10px; color: var(--muted); font-family: var(--mono); font-size: 10.5px; }
+.muted-note { padding: 4px 14px; color: var(--muted); font-size: 12.5px; margin: 0; }
+
+@media (max-width: 720px) {
+  .tabs { order: 3; width: 100%; }
+  .tabs button { flex: 1; }
+}
