@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "disco-preview",
+      "runtimeExecutable": "disco",
+      "runtimeArgs": ["preview", "disco/ekg-conflicts", "--port", "4400", "--no-open"],
+      "port": 4400
+    }
+  ]
+}
