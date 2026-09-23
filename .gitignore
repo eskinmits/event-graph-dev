@@ -23,3 +23,4 @@ wheels/
 
 # Cached graph slices, rebuildable from ClickHouse (D1)
 slices/
+junk_nodes.csv
