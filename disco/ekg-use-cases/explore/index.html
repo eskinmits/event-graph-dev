@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Event Knowledge Graph</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="brand" data-go="intro" title="Back to the start">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="26" height="26"><g fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="9" x2="22" y2="7"/><line x1="8" y1="9" x2="12" y2="23"/><line x1="22" y1="7" x2="25" y2="20"/><line x1="12" y1="23" x2="25" y2="20"/><line x1="8" y1="9" x2="25" y2="20" stroke-dasharray="3 3"/></g><circle cx="8" cy="9" r="4" fill="#3987e5"/><circle cx="22" cy="7" r="3.5" fill="#d95926"/><circle cx="12" cy="23" r="3.5" fill="#199e70"/><circle cx="25" cy="20" r="3.5" fill="#9085e9"/></svg>
+      </span>
+      <span class="brand-text">Event Knowledge Graph</span>
+    </button>
+    <nav class="chapters" id="chapters" aria-label="Chapters"></nav>
+    <div class="topbar-right">
+      <div class="market" role="group" aria-label="Market">
+        <button data-market="NL" class="on">NL</button>
+        <button data-market="ES">ES</button>
+      </div>
+      <span class="presence" id="presence" title="People with this page open"></span>
+    </div>
+  </header>
+
+  <main id="stage">
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Loading the graph…</p>
+    </div>
+  </main>
+
+  <div class="tooltip" id="tooltip" role="tooltip"></div>
+  <div class="keys-hint" id="keysHint">← → to move between chapters</div>
+
+  <!-- inside ekg-use-cases the Disco SDK is served at the site root only -->
+  <script src="../__disco.js"></script>
+  <script src="js/cytoscape.min.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/graphview.js"></script>
+  <script src="js/ch-intro.js"></script>
+  <script src="js/ch-explore.js"></script>
+  <script src="js/ch-dedup.js"></script>
+  <script src="js/ch-linking.js"></script>
+  <script src="js/ch-predict.js"></script>
+  <script src="js/ch-recommend.js"></script>
+  <script src="js/ch-junk.js"></script>
+  <script src="js/ch-lessons.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

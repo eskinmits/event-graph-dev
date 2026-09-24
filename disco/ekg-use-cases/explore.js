@@ -1,9 +1,9 @@
-/* use cases 3 and 4 are chapters of ekg-explore, shown in one frame. ekg-explore keeps the data
+/* use cases 3 and 4 are chapters of the event knowledge graph explorer (explore/), shown in one frame. It keeps the data
    (hundreds of shards per market), so it loads once, only when one of these tabs is first opened,
    and switching between them only changes the fragment, which does not reload the frame. */
 (function () {
-  // deployed, both apps sit side by side on the same host; in `disco preview` ekg-explore runs on its own port
-  const BASE = location.hostname === 'localhost' ? 'http://localhost:4401/' : '../ekg-explore/';
+  // the explorer lives in explore/ inside this site, so it shares this app's Disco backend and login
+  const BASE = 'explore/';
   let frame = null;
 
   function show(chapter) {

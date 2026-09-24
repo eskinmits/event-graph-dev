@@ -30,3 +30,6 @@ disco/ekg-use-cases/data/
 
 # Worklists and reports from bin/, rebuildable from ClickHouse (D1)
 out/
+
+# the explorer copy inside ekg-use-cases: code tracked, its ~190 MB of data refreshed from Disco
+disco/ekg-use-cases/explore/data/
