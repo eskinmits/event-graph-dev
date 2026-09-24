@@ -26,7 +26,7 @@ slices/
 junk_nodes.csv
 
 # Disco app data snapshot, rebuildable with disco/export_snapshot.py (D1)
-disco/ekg-conflicts/data/
+disco/ekg-use-cases/data/
 
 # Worklists and reports from bin/, rebuildable from ClickHouse (D1)
 out/

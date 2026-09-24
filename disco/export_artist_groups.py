@@ -29,7 +29,7 @@ from event_graph.config import get_config
 logger = logging.getLogger(__name__)
 
 DEFAULT_DEDUP: Final = Path("out/artist_dedup")
-DEFAULT_OUTPUT: Final = Path(__file__).parent / "ekg-conflicts" / "data" / "artists.json"
+DEFAULT_OUTPUT: Final = Path(__file__).parent / "ekg-use-cases" / "data" / "artists.json"
 RECENT_EVENTS: Final = 4
 # how many shared things of each kind the graph draws, so a big touring act stays readable
 GRAPH_CAP: Final[dict[str, int]] = {"night": 4, "venue": 6, "city": 4, "coperformer": 5, "similar": 5}

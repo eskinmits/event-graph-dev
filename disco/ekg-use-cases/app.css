@@ -1,0 +1,35 @@
+/* ekg-use-cases on top of ekg-explore's design system (ekg/ekg.css): only what these tabs add */
+
+/* the loading veil only shows while a use case is fetching its data */
+.loading { display: none; z-index: 5; background: var(--bg); }
+.loading.on { display: grid; }
+
+/* the link out to the full explorer, only on its two tabs */
+.open-explore { display: none; font-size: 12.5px; color: var(--text-muted); text-decoration: none; white-space: nowrap; }
+.open-explore:hover { color: var(--text-primary); }
+body[data-tab="linking"] .open-explore,
+body[data-tab="recommend"] .open-explore { display: inline; }
+
+/* use cases 3 and 4: ekg-explore's chapters in one frame */
+#ch-explore.on { display: block; }
+.explore-frame { position: absolute; inset: 0; background: var(--bg); }
+.explore-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+/* worklist and argument rows */
+.story .worklist { flex: 1; }
+.segmented button .muted { font-size: 11.5px; margin-left: 2px; }
+.row.static { cursor: default; }
+.row .end.pos { color: var(--good); font-weight: 600; }
+.row .end.neg { color: var(--bad); font-weight: 600; }
+.row .end.links a { color: var(--accent); text-decoration: none; margin-left: 10px; font-size: 12.5px; }
+.row .end.links a:hover { text-decoration: underline; }
+.legend .line.clash { border-top: 2px dashed var(--bad); }
+
+/* the duplicate artist rows, in the argument */
+.members { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.member { background: var(--surface-2); border: 1px solid var(--line-soft); border-radius: var(--radius-sm); padding: 9px 11px; }
+.member.keep { border-color: rgba(47, 191, 113, 0.5); }
+.member-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 2px; }
+.member-head b { color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.member-event { font-size: 12.5px; color: var(--text-secondary); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.member-event span:first-child { color: var(--text-muted); font-variant-numeric: tabular-nums; margin-right: 4px; }

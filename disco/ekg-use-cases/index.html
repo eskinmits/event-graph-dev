@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EKG Use Cases</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="ekg/ekg.css">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="26" height="26"><g fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="9" x2="22" y2="7"/><line x1="8" y1="9" x2="12" y2="23"/><line x1="22" y1="7" x2="25" y2="20"/><line x1="12" y1="23" x2="25" y2="20"/><line x1="8" y1="9" x2="25" y2="20" stroke-dasharray="3 3"/></g><circle cx="8" cy="9" r="4" fill="#3987e5"/><circle cx="22" cy="7" r="3.5" fill="#d95926"/><circle cx="12" cy="23" r="3.5" fill="#199e70"/><circle cx="25" cy="20" r="3.5" fill="#9085e9"/></svg>
+      </span>
+      <span class="brand-text">EKG Use Cases</span>
+    </div>
+    <nav class="chapters" id="chapters" aria-label="Use cases">
+      <button data-tab="conflicts"><span class="n">1</span>Event conflicts</button>
+      <button data-tab="artists"><span class="n">2</span>Artist duplicates</button>
+      <button data-tab="linking"><span class="n">3</span>Missing artists</button>
+      <button data-tab="recommend"><span class="n">4</span>Recommend</button>
+    </nav>
+    <div class="topbar-right">
+      <a class="open-explore" id="explore-open" target="_blank" rel="noopener">Open in ekg-explore ↗</a>
+      <span class="presence" id="presence" title="People with this page open"></span>
+    </div>
+  </header>
+
+  <main id="stage">
+    <section class="chapter" id="ch-conflicts">
+      <div class="split three">
+        <div class="story">
+          <div class="eyebrow">Event conflicts · Spain, upcoming</div>
+          <h2>An artist can't play two places at once.</h2>
+          <p class="lede" id="cf-lede"></p>
+          <div class="segmented" id="cf-filter"></div>
+          <div class="callout small" id="cf-callout"></div>
+          <input class="search" id="cf-search" placeholder="Filter by artist, venue or city…" autocomplete="off">
+          <div class="worklist"><div class="list" id="cf-list"></div></div>
+        </div>
+        <div class="canvas-wrap">
+          <div class="cy" id="cf-cy"></div>
+          <div class="canvas-title" id="cf-title"></div>
+          <div class="canvas-caption"><div id="cf-legend"></div></div>
+        </div>
+        <div class="story right" id="cf-argument"></div>
+      </div>
+    </section>
+
+    <section class="chapter" id="ch-artists">
+      <div class="split three">
+        <div class="story">
+          <div class="eyebrow">Artist deduplication · all markets</div>
+          <h2>One act, stored more than once.</h2>
+          <p class="lede" id="ad-lede"></p>
+          <div class="segmented" id="ad-filter"></div>
+          <div class="callout good small" id="ad-callout"></div>
+          <input class="search" id="ad-search" placeholder="Filter by artist, venue or city…" autocomplete="off">
+          <div class="worklist"><div class="list" id="ad-list"></div></div>
+        </div>
+        <div class="canvas-wrap">
+          <div class="cy" id="ad-cy"></div>
+          <div class="canvas-title" id="ad-title"></div>
+          <div class="canvas-caption"><div id="ad-legend"></div></div>
+        </div>
+        <div class="story right" id="ad-argument"></div>
+      </div>
+    </section>
+
+    <section class="chapter" id="ch-explore">
+      <div class="explore-frame" id="explore-frame"></div>
+    </section>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Loading the worklists…</p>
+    </div>
+  </main>
+
+  <div class="tooltip" id="tooltip" role="tooltip"></div>
+
+  <script src="__disco.js"></script>
+  <script src="cytoscape.min.js"></script>
+  <script src="ekg/core.js"></script>
+  <script src="ekg/graphview.js"></script>
+  <script src="explore.js"></script>
+  <script src="conflicts.js"></script>
+  <script src="artists.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

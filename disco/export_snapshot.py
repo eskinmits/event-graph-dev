@@ -34,7 +34,7 @@ from event_graph.graph.store import load_graph
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_OUTPUT: Final = Path(__file__).parent / "ekg-conflicts" / "data" / "snapshot.json"
+DEFAULT_OUTPUT: Final = Path(__file__).parent / "ekg-use-cases" / "data" / "snapshot.json"
 
 # mirrors junk_artist_labels in bridge_graph_edges_derived.sql
 JUNK_ARTIST_LABELS: Final[tuple[str, ...]] = (
