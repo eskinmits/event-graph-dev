@@ -16,6 +16,7 @@ closure is the same one `EventGraph.components({Predicate.SAME_AS})` produces.
 | `junk_nodes.py` | Which nodes are junk hubs (placeholder artists, theme nights, city-named venues, deletion sinks) and which are real nodes carrying wrong links. Writes a seed-shaped CSV |
 | `duplicate_detection_backtest.py` | Could we surface a duplicate event before ops manually redirects it? Rule recall, candidate volume, and the standing worklist |
 | `duplicate_graph_signals.py` | Does graph structure tell real duplicates from same-venue coincidences? Needs a cached slice |
+| `union_view_checks.py` | What the union view says once inferred edges sit beside source and derived ones: coverage lift by market and category, junk checks, proposals that clash with a same-night booking (mostly duplicates), and venue or city history behind each proposal |
 
 ```bash
 uv run python bin/redirect_transfer_coverage.py
@@ -27,6 +28,7 @@ uv run python bin/duplicate_name_reach.py --naive              # the every-row o
 uv run python bin/duplicate_detection_backtest.py
 uv run python bin/duplicate_detection_backtest.py --year 2023
 uv run python bin/junk_nodes.py                              # writes junk_nodes.csv
+uv run python bin/union_view_checks.py                       # reads dbt_dev.bridge_graph_edges
 
 uv run event-graph graph build --country NL --save slices/nl.pkl   # once, ~6 min
 uv run python bin/duplicate_graph_signals.py --slice slices/nl.pkl --country NL
